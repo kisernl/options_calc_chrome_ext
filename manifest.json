@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Stock Price Viewer",
+  "version": "1.0.0",
+  "description": "View current stock prices using Finnhub API",
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "48": "./public/icon48.png"
+    }
+  },
+  "icons": {
+    "48": "./public/icon48.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://finnhub.io/*"
+  ]
+}

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Options Income Calculator</title>
+    <link rel="stylesheet" href="src/styles.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Options Income Calculator</h1>
+      
+      <!-- Settings Section -->
+      <div class="settings-panel">
+        <div class="settings-header">
+          <h2>Settings</h2>
+          <button id="toggleSettings" class="settings-toggle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.16.64.76 1.11 1.42 1.26l.18.03H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1v0z"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="settings-content" id="settingsContent">
+          <div class="form-group">
+            <label for="apiKey">Finnhub API Key:</label>
+            <div class="api-key-input">
+              <input type="password" id="apiKey" placeholder="Enter your Finnhub API key">
+              <button id="saveApiKey">Save</button>
+            </div>
+            <div class="api-key-note">
+              <small>Your API key is stored locally in your browser and is never sent to our servers.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="stockSymbol">Stock Symbol:</label>
+        <div class="symbol-input">
+          <input type="text" id="stockSymbol" placeholder="e.g., AAPL" value="AAPL">
+          <button id="fetchData">Get Data</button>
+        </div>
+        <div id="stockPrice" class="stock-price">Price: -</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-button active" data-tab="cash-secured-puts">Cash Secured Puts</button>
+        <button class="tab-button" data-tab="covered-calls">Covered Calls</button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Cash Secured Puts Tab -->
+        <div id="cash-secured-puts" class="tab-pane active">
+          <div class="options-form">
+            <div class="form-group">
+              <label for="putStrike">Strike Price ($)</label>
+              <input type="number" id="putStrike" step="0.01" min="0.01">
+            </div>
+            <div class="form-group">
+              <label for="putPremium">Premium per Share ($)</label>
+              <input type="number" id="putPremium" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+              <label for="putContracts">Number of Contracts</label>
+              <input type="number" id="putContracts" min="1" value="1">
+            </div>
+            <div class="form-group">
+              <label for="putExpiration">Expiration Date</label>
+              <input type="date" id="putExpiration" required>
+            </div>
+            <button id="calculatePut" class="calculate-btn">Calculate</button>
+            
+            <div class="results">
+              <h3>Results</h3>
+              <div class="result-item">
+                <span>Total Premium:</span>
+                <span id="putTotalPremium">$0.00</span>
+              </div>
+              <div class="result-item">
+                <span>Cash Required:</span>
+                <span id="putCashRequired">$0.00</span>
+              </div>
+              <div class="result-item">
+                <span>Return on Cash:</span>
+                <span id="putRoi">0.00%</span>
+              </div>
+              <div class="result-item">
+                <span>Days to Expiration:</span>
+                <span id="putDaysToExp">0</span>
+              </div>
+              <div class="result-item">
+                <span>Annualized Return:</span>
+                <span id="putAnnualizedRoi">0.00%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Covered Calls Tab -->
+        <div id="covered-calls" class="tab-pane">
+          <div class="options-form">
+            <div class="form-group">
+              <label for="callStrike">Strike Price ($)</label>
+              <input type="number" id="callStrike" step="0.01" min="0.01">
+            </div>
+            <div class="form-group">
+              <label for="callPremium">Premium per Share ($)</label>
+              <input type="number" id="callPremium" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+              <label for="callContracts">Number of Contracts</label>
+              <input type="number" id="callContracts" min="1" value="1">
+            </div>
+            <div class="form-group">
+              <label for="sharesOwned">Shares to Cover</label>
+              <input type="number" id="sharesOwned" min="1" value="100">
+            </div>
+            <div class="form-group">
+              <label for="callExpiration">Expiration Date</label>
+              <input type="date" id="callExpiration" required>
+            </div>
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="alreadyOwnShares">
+              <label for="alreadyOwnShares">I already own these shares</label>
+            </div>
+            <div id="purchasePriceGroup" class="form-group" style="display: none;">
+              <label for="purchasePrice">Purchase Price per Share ($)</label>
+              <input type="number" id="purchasePrice" step="0.01" min="0.01">
+            </div>
+            <button id="calculateCall" class="calculate-btn">Calculate</button>
+            
+            <div class="results">
+              <h3>Results</h3>
+              <div class="result-item">
+                <span>Total Premium:</span>
+                <span id="callTotalPremium">$0.00</span>
+              </div>
+              <div class="result-item">
+                <span>Max Profit:</span>
+                <span id="callMaxProfit">$0.00</span>
+              </div>
+              <div class="result-item">
+                <span>Return on Investment:</span>
+                <span id="callRoi">0.00%</span>
+              </div>
+              <div class="result-item">
+                <span>Days to Expiration:</span>
+                <span id="callDaysToExp">0</span>
+              </div>
+              <div class="result-item">
+                <span>Annualized Return:</span>
+                <span id="callAnnualizedRoi">0.00%</span>
+              </div>
+              <div id="callCostBasisInfo" class="result-item" style="display: none;">
+                <span>Cost Basis per Share:</span>
+                <span id="callCostBasis">$0.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="loading" id="loading">Loading data...</div>
+      <div class="error" id="error"></div>
+      <div class="info" id="info">
+        <small>Don't have a Finnhub API key? <a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">Get one here</a> (free tier available)</small>
+      </div>
+    </div>
+    
+    <script src="src/options-viewer.js"></script>
+  </body>
+</html>
