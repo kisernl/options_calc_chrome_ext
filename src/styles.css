@@ -193,8 +193,8 @@ button:active {
   display: flex;
   justify-content: space-between;
   margin: 4px 0;
-  font-size: 0.85rem;
-  line-height: 1.4;
+  padding: 4px 0;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .result-item:last-child {
@@ -204,6 +204,22 @@ button:active {
   font-weight: 600;
   color: #2d3748;
   margin-top: 6px;
+}
+
+#callCostBasisInfo {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+  padding: 4px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Dark mode adjustments for result items */
+@media (prefers-color-scheme: dark) {
+  .result-item,
+  #callCostBasisInfo {
+    border-bottom-color: #3d3d3d;
+  }
 }
 
 /* Checkbox styling */
@@ -292,6 +308,45 @@ button:active {
   color: #6c757d;
   font-size: 0.75rem;
   line-height: 1.4;
+}
+
+.api-key-link {
+  margin-top: 4px;
+}
+
+.api-key-link a {
+  color: #1976d2;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.api-key-link a:hover {
+  text-decoration: underline;
+}
+
+/* Disclaimer */
+.disclaimer {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #6c757d;
+}
+
+.disclaimer small {
+  display: block;
+  padding: 5px 0;
+}
+
+/* Make sure the disclaimer is visible in both light and dark modes */
+@media (prefers-color-scheme: dark) {
+  .disclaimer {
+    background-color: #2d2d2d;
+    border-top-color: #3d3d3d;
+    color: #adb5bd;
+  }
 }
 
 /* Loading and error states */

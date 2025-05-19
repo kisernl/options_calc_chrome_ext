@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const putRoiEl = document.getElementById('putRoi');
     const putDaysToExpEl = document.getElementById('putDaysToExp');
     const putAnnualizedRoiEl = document.getElementById('putAnnualizedRoi');
+    const putPositionValueEl = document.getElementById('putPositionValue');
+    const putPremiumReturnEl = document.getElementById('putPremiumReturn');
     
     // Covered Calls
     const callStrikeInput = document.getElementById('callStrike');
@@ -43,6 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const callAnnualizedRoiEl = document.getElementById('callAnnualizedRoi');
     const callCostBasisInfo = document.getElementById('callCostBasisInfo');
     const callCostBasisEl = document.getElementById('callCostBasis');
+    const callPositionValueEl = document.getElementById('callPositionValue');
+    const callTotalReturnEl = document.getElementById('callTotalReturn');
     
     // Finnhub API configuration
     const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
@@ -67,11 +71,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return Math.round(Math.abs((date1 - date2) / oneDay));
     }
     
-    // Annualize return
-    function annualizeReturn(returnPercentage, days) {
-        if (days <= 0) return 0;
-        const years = days / 365;
-        return (Math.pow(1 + (returnPercentage / 100), 1 / years) - 1) * 100;
+    // Helper function to calculate simple annualized return (non-compounded)
+    function calculateAnnualizedReturn(returnPercentage, days) {
+        if (days <= 0 || isNaN(returnPercentage) || returnPercentage === 0) return 0;
+        // Calculate simple annualized return: (returnPercentage * (365/days))
+        return (returnPercentage * (365 / days));
     }
     
     // Load API key from local storage
@@ -180,24 +184,34 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Calculate Cash Secured Put returns
     function calculatePutReturns() {
-        const strike = parseFloat(putStrikeInput.value) || 0;
-        const premium = parseFloat(putPremiumInput.value) || 0;
+        const strikePrice = parseFloat(putStrikeInput.value);
+        const premium = parseFloat(putPremiumInput.value);
         const contracts = parseInt(putContractsInput.value) || 1;
-        const expirationDate = new Date(putExpirationInput.value);
-        const today = new Date();
+        const expirationDate = putExpirationInput.value ? new Date(putExpirationInput.value) : null;
         
-        if (strike <= 0 || premium < 0 || contracts <= 0) {
-            showError('Please enter valid values for strike price, premium, and contracts');
-            return;
+        // Clear any previous errors
+        clearError();
+        
+        // Only calculate if we have valid inputs
+        if (isNaN(strikePrice) || isNaN(premium) || strikePrice <= 0 || premium <= 0) {
+            return; // Don't show error, just return early
         }
         
-        // Calculate days to expiration
-        const daysToExpiration = daysBetween(today, expirationDate);
+        const totalPremium = premium * contracts * 100;
+        const cashRequired = (strikePrice - premium) * contracts * 100; // Actual cash at risk
+        const positionValue = strikePrice * contracts * 100;
         
-        const totalPremium = premium * 100 * contracts;
-        const cashRequired = strike * 100 * contracts;
-        const roi = (totalPremium / cashRequired) * 100;
-        const annualizedRoi = annualizeReturn(roi, daysToExpiration);
+        // Calculate days to expiration
+        let daysToExpiration = 0;
+        if (expirationDate) {
+            const today = new Date();
+            daysToExpiration = Math.max(0, Math.ceil((expirationDate - today) / (1000 * 60 * 60 * 24)));
+        }
+        
+        // Calculate ROI and annualized ROI
+        // ROI = (premium / (strike - premium)) * 100
+        const roi = (premium / (strikePrice - premium)) * 100;
+        const annualizedRoi = calculateAnnualizedReturn(roi, daysToExpiration || 1);
         
         // Update UI
         putTotalPremiumEl.textContent = formatCurrency(totalPremium);
@@ -205,57 +219,80 @@ document.addEventListener('DOMContentLoaded', function() {
         putRoiEl.textContent = formatPercentage(roi);
         putDaysToExpEl.textContent = daysToExpiration;
         putAnnualizedRoiEl.textContent = formatPercentage(annualizedRoi);
+        putPositionValueEl.textContent = formatCurrency(positionValue);
+        putPremiumReturnEl.textContent = formatPercentage(roi);
+        
+        // Scroll results into view
+        document.querySelector('#cash-secured-puts .results').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'nearest'
+        });
     }
     
     // Calculate Covered Call returns
     function calculateCallReturns() {
-        const strike = parseFloat(callStrikeInput.value) || 0;
-        const premium = parseFloat(callPremiumInput.value) || 0;
+        const strikePrice = parseFloat(callStrikeInput.value);
+        const premium = parseFloat(callPremiumInput.value);
         const contracts = parseInt(callContractsInput.value) || 1;
-        const shares = parseInt(sharesOwnedInput.value) || 100;
-        const expirationDate = new Date(callExpirationInput.value);
-        const today = new Date();
-        const alreadyOwnShares = alreadyOwnSharesCheckbox.checked;
+        const expirationDate = callExpirationInput.value ? new Date(callExpirationInput.value) : null;
+        const sharesOwned = alreadyOwnSharesCheckbox.checked ? (parseInt(sharesOwnedInput.value) || 0) : 0;
         const purchasePrice = parseFloat(purchasePriceInput.value) || 0;
         
-        if (strike <= 0 || premium < 0 || contracts <= 0 || shares <= 0) {
-            showError('Please enter valid values for strike price, premium, contracts, and shares');
-            return;
+        // Clear any previous errors
+        clearError();
+        
+        // Only calculate if we have valid inputs
+        if (isNaN(strikePrice) || isNaN(premium) || strikePrice <= 0 || premium <= 0) {
+            return; // Don't show error, just return early
         }
         
-        // Calculate days to expiration
-        const daysToExpiration = daysBetween(today, expirationDate);
+        // Additional validation for covered calls with owned shares
+        if (alreadyOwnSharesCheckbox.checked && (isNaN(purchasePrice) || purchasePrice <= 0)) {
+            return; // Don't show error, just return early
+        }
         
-        const totalPremium = premium * 100 * contracts;
+        const totalPremium = premium * contracts * 100;
         const sharesPerContract = 100;
         const totalShares = contracts * sharesPerContract;
         
-        let maxProfit, roi, costBasis;
-        
-        if (alreadyOwnShares) {
-            // If already own shares, calculate based on purchase price
-            costBasis = purchasePrice * shares;
-            const saleProceeds = strike * shares;
-            const profitFromSale = saleProceeds - costBasis;
-            maxProfit = profitFromSale + totalPremium;
-            roi = (maxProfit / costBasis) * 100;
+        // Calculate position value (cost of shares at current or purchase price)
+        const positionValue = alreadyOwnSharesCheckbox.checked 
+            ? purchasePrice * totalShares 
+            : currentStockPrice * totalShares;
             
-            // Show cost basis info
-            callCostBasisInfo.style.display = 'flex';
-            callCostBasisEl.textContent = formatCurrency(purchasePrice);
-        } else {
-            // If not owning shares, calculate based on current price
-            const costToBuyShares = currentStockPrice * shares;
-            const saleProceeds = strike * shares;
-            const profitFromSale = saleProceeds - costToBuyShares;
-            maxProfit = profitFromSale + totalPremium;
-            roi = (totalPremium / costToBuyShares) * 100;
-            
-            // Hide cost basis info
-            callCostBasisInfo.style.display = 'none';
+        // Calculate days to expiration
+        let daysToExpiration = 0;
+        if (expirationDate) {
+            const today = new Date();
+            daysToExpiration = Math.max(0, Math.ceil((expirationDate - today) / (1000 * 60 * 60 * 24)));
         }
         
-        const annualizedRoi = annualizeReturn(roi, daysToExpiration);
+        // Calculate max profit, total return, and ROI
+        let maxProfit, totalReturn, roi, roiDenominator;
+        
+        if (alreadyOwnSharesCheckbox.checked) {
+            // If already own shares
+            const profitPerShare = (strikePrice - purchasePrice) + premium;
+            maxProfit = profitPerShare * totalShares;
+            totalReturn = (profitPerShare / purchasePrice) * 100;
+            
+            // ROI = premium / purchasePrice (since shares are already owned)
+            roi = (premium / purchasePrice) * 100;
+        } else {
+            // If selling covered call without owning (cash-secured call)
+            const profitPerShare = (strikePrice - currentStockPrice) + premium;
+            maxProfit = profitPerShare * totalShares;
+            
+            // For cash-secured call, capital at risk is (current price - premium)
+            roiDenominator = currentStockPrice - premium;
+            roi = (premium / roiDenominator) * 100;
+            
+            // Total return is profit / investment
+            totalReturn = (profitPerShare / currentStockPrice) * 100;
+        }
+        
+        // Calculate annualized ROI based on premium return
+        const annualizedRoi = calculateAnnualizedReturn(roi, daysToExpiration || 1);
         
         // Update UI
         callTotalPremiumEl.textContent = formatCurrency(totalPremium);
@@ -263,6 +300,23 @@ document.addEventListener('DOMContentLoaded', function() {
         callRoiEl.textContent = formatPercentage(roi);
         callDaysToExpEl.textContent = daysToExpiration;
         callAnnualizedRoiEl.textContent = formatPercentage(annualizedRoi);
+        callPositionValueEl.textContent = formatCurrency(positionValue);
+        callTotalReturnEl.textContent = formatPercentage(totalReturn);
+        
+        // Update cost basis info if shares are already owned
+        if (alreadyOwnSharesCheckbox.checked) {
+            const costBasis = purchasePrice - premium;
+            callCostBasisEl.textContent = formatCurrency(costBasis);
+            callCostBasisInfo.style.display = 'flex'; // Changed to flex to match other result items
+        } else {
+            callCostBasisInfo.style.display = 'none';
+        }
+        
+        // Scroll results into view
+        document.querySelector('#covered-calls .results').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'nearest'
+        });
     }
     
     // Main function to fetch and display data
@@ -286,15 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const price = await fetchStockPrice(symbol);
             currentStockPrice = price;
-            stockPriceEl.textContent = `Current Price: ${formatCurrency(price)}`;
-            
-            // Auto-fill strike prices with current price if empty
-            if (!putStrikeInput.value) putStrikeInput.value = price.toFixed(2);
-            if (!callStrikeInput.value) callStrikeInput.value = (price * 1.05).toFixed(2);
-            
-            // Calculate if we have premium values
-            if (putPremiumInput.value) calculatePutReturns();
-            if (callPremiumInput.value) calculateCallReturns();
+            stockPriceEl.textContent = `Last Price: ${formatCurrency(price)}`;
             
         } catch (error) {
             // Error is already handled in the fetch function

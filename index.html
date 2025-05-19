@@ -30,6 +30,9 @@
             </div>
             <div class="api-key-note">
               <small>Your API key is stored locally in your browser and is never sent to our servers.</small>
+              <div class="api-key-link">
+                <a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer" style="font-size: xx-small;">Get a free Finnhub API key</a>
+              </div>
             </div>
           </div>
         </div>
@@ -39,7 +42,7 @@
         <label for="stockSymbol">Stock Symbol:</label>
         <div class="symbol-input">
           <input type="text" id="stockSymbol" placeholder="e.g., AAPL" value="AAPL">
-          <button id="fetchData">Get Data</button>
+          <button id="fetchData">Go</button>
         </div>
         <div id="stockPrice" class="stock-price">Price: -</div>
       </div>
@@ -57,7 +60,7 @@
           <div class="options-form">
             <div class="form-group">
               <label for="putStrike">Strike Price ($)</label>
-              <input type="number" id="putStrike" step="0.01" min="0.01">
+              <input type="number" id="putStrike" step="0.01" min="0.01" placeholder="0.00">
             </div>
             <div class="form-group">
               <label for="putPremium">Premium per Share ($)</label>
@@ -95,6 +98,14 @@
                 <span>Annualized Return:</span>
                 <span id="putAnnualizedRoi">0.00%</span>
               </div>
+              <div class="result-item">
+                <span>Position Value:</span>
+                <span id="putPositionValue">$0.00</span>
+              </div>
+              <div class="result-item">
+                <span>Premium Return:</span>
+                <span id="putPremiumReturn">0.00%</span>
+              </div>
             </div>
           </div>
         </div>
@@ -104,7 +115,7 @@
           <div class="options-form">
             <div class="form-group">
               <label for="callStrike">Strike Price ($)</label>
-              <input type="number" id="callStrike" step="0.01" min="0.01">
+              <input type="number" id="callStrike" step="0.01" min="0.01" placeholder="0.00">
             </div>
             <div class="form-group">
               <label for="callPremium">Premium per Share ($)</label>
@@ -143,7 +154,7 @@
                 <span id="callMaxProfit">$0.00</span>
               </div>
               <div class="result-item">
-                <span>Return on Investment:</span>
+                <span>Return on Premium:</span>
                 <span id="callRoi">0.00%</span>
               </div>
               <div class="result-item">
@@ -153,6 +164,18 @@
               <div class="result-item">
                 <span>Annualized Return:</span>
                 <span id="callAnnualizedRoi">0.00%</span>
+              </div>
+              <div class="result-item">
+                <span>Position Value:</span>
+                <span id="callPositionValue">$0.00</span>
+              </div>
+              <!-- <div class="result-item">
+                <span>Premium Return:</span>
+                <span id="callPremiumReturn">0.00%</span>
+              </div> -->
+              <div class="result-item">
+                <span>Total Return (with stock):</span>
+                <span id="callTotalReturn">0.00%</span>
               </div>
               <div id="callCostBasisInfo" class="result-item" style="display: none;">
                 <span>Cost Basis per Share:</span>
@@ -166,7 +189,10 @@
       <div class="loading" id="loading">Loading data...</div>
       <div class="error" id="error"></div>
       <div class="info" id="info">
-        <small>Don't have a Finnhub API key? <a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">Get one here</a> (free tier available)</small>
+      </div>
+      
+      <div class="disclaimer">
+        <small>DISCLAIMER: This calculator is for educational and informational purposes only. It is not intended as financial advice. Options trading involves significant risk of loss and is not suitable for all investors. Past performance is not indicative of future results. Please consult with a qualified financial advisor before making any investment decisions.</small>
       </div>
     </div>
     
