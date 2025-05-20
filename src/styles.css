@@ -32,6 +32,16 @@ h1 {
   border-bottom: 1px solid #e2e8f0;
 }
 
+h1.container-title {
+  font-size: 1.2rem;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+  text-align: center;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
 h2 {
   font-size: 1rem;
   color: #2c3e50;
@@ -106,7 +116,7 @@ button:active {
   font-weight: 600;
   text-align: center;
   margin: 6px 0;
-  padding: 8px;
+  padding: 6px;
   background: white;
   border-radius: 4px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -116,7 +126,7 @@ button:active {
 .tabs {
   display: flex;
   border-bottom: 1px solid #e2e8f0;
-  margin: 4px 0 8px 0;
+  margin: 4px 0 6px 0;
 }
 
 .tab-button {
@@ -163,12 +173,12 @@ button:active {
 
 .calculate-btn {
   margin: 8px 0;
-  background-color: #38a169;
+  background-color: #4299e1;
   width: 100%;
 }
 
 .calculate-btn:hover {
-  background-color: #2f855a;
+  background-color: #3182ce;
 }
 
 /* Results */
@@ -214,14 +224,6 @@ button:active {
   border-bottom: 1px solid #e9ecef;
 }
 
-/* Dark mode adjustments for result items */
-@media (prefers-color-scheme: dark) {
-  .result-item,
-  #callCostBasisInfo {
-    border-bottom-color: #3d3d3d;
-  }
-}
-
 /* Checkbox styling */
 .checkbox-group {
   display: flex;
@@ -247,7 +249,7 @@ button:active {
   background: white;
   border-radius: 4px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   overflow: hidden;
 }
 
@@ -304,10 +306,14 @@ button:active {
 }
 
 .api-key-note {
-  margin-top: 6px;
-  color: #6c757d;
+  margin-top: 8px;
+  color: #666;
   font-size: 0.75rem;
   line-height: 1.4;
+}
+
+.api-key-required {
+  display: none;
 }
 
 .api-key-link {
@@ -322,6 +328,77 @@ button:active {
 
 .api-key-link a:hover {
   text-decoration: underline;
+}
+
+/* Tooltip styles */
+.label-with-tooltip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.tooltip-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background-color: #4299e1;
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: help;
+  transition: background-color 0.2s;
+}
+
+.tooltip:hover .tooltip-icon {
+  background-color: #2b6cb0;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #2d3748;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.8rem;
+  font-weight: normal;
+  line-height: 1.4;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #2d3748 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }
 
 /* Disclaimer */

@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const stockPriceEl = document.getElementById('stockPrice');
     const loadingEl = document.getElementById('loading');
     const errorEl = document.getElementById('error');
+    const symbolErrorEl = document.getElementById('symbolError');
     const apiKeyInput = document.getElementById('apiKey');
     const saveApiKeyButton = document.getElementById('saveApiKey');
     const toggleSettingsButton = document.getElementById('toggleSettings');
@@ -126,9 +127,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Show error message
-    function showError(message) {
-        errorEl.textContent = message;
-        errorEl.style.display = 'block';
+    function showError(message, isSymbolError = false) {
+        if (isSymbolError) {
+            symbolErrorEl.textContent = message;
+            symbolErrorEl.style.display = 'block';
+            errorEl.style.display = 'none';
+        } else {
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            symbolErrorEl.style.display = 'none';
+        }
+    }
+
+    // Clear error
+    function clearError() {
+        errorEl.style.display = 'none';
+        symbolErrorEl.style.display = 'none';
     }
     
     // Show success message
@@ -143,16 +157,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
-    // Clear error
-    function clearError() {
-        errorEl.textContent = '';
-        errorEl.style.display = 'none';
-    }
-    
     // Fetch stock price
     async function fetchStockPrice(symbol) {
         if (!finnhubApiKey) {
-            showError('Please set your Finnhub API key in settings');
+            showError('Please set your Finnhub API key in settings', true);
             settingsContent.classList.add('visible');
             throw new Error('API key not set');
         }
@@ -173,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error fetching stock price:', error);
             if (error.message.includes('API key')) {
-                showError('Invalid API key. Please check your Finnhub API key in settings.');
+                showError('Invalid API key. Please check your Finnhub API key in settings.', true);
                 settingsContent.classList.add('visible');
             } else {
                 showError('Failed to fetch stock price. ' + error.message);
@@ -322,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Main function to fetch and display data
     async function fetchAndDisplayData() {
         if (!finnhubApiKey) {
-            showError('Please set your Finnhub API key in settings');
+            showError('Please set your Finnhub API key in settings', true);
             settingsContent.classList.add('visible');
             return;
         }
@@ -330,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const symbol = stockSymbolInput.value.trim().toUpperCase();
         
         if (!symbol) {
-            showError('Please enter a stock symbol');
+            showError('Please enter a stock symbol', true);
             return;
         }
         

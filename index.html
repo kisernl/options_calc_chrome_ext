@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Options Income Calculator</title>
+    <title>Simple Options Calculator</title>
     <link rel="stylesheet" href="src/styles.css">
   </head>
   <body>
     <div class="container">
-      <h1>Options Income Calculator</h1>
+      <h1 class="container-title">Options Calculator (Simple)</h1>
       
       <!-- Settings Section -->
       <div class="settings-panel">
@@ -30,6 +30,9 @@
             </div>
             <div class="api-key-note">
               <small>Your API key is stored locally in your browser and is never sent to our servers.</small>
+              <div class="api-key-required">
+                <small><strong>Note:</strong> A Finnhub.io API key is required to fetch stock data.</small>
+              </div>
               <div class="api-key-link">
                 <a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer" style="font-size: xx-small;">Get a free Finnhub API key</a>
               </div>
@@ -39,11 +42,18 @@
       </div>
 
       <div class="input-group">
-        <label for="stockSymbol">Stock Symbol:</label>
+        <div class="label-with-tooltip">
+          <label for="stockSymbol">Stock Symbol:</label>
+          <div class="tooltip">
+            <span class="tooltip-icon">?</span>
+            <span class="tooltip-text">A Finnhub.io API key is required to fetch stock data. Click the settings icon to add your API key.</span>
+          </div>
+        </div>
         <div class="symbol-input">
-          <input type="text" id="stockSymbol" placeholder="e.g., AAPL" value="AAPL">
+          <input type="text" id="stockSymbol" placeholder="e.g., SPY" value="">
           <button id="fetchData">Go</button>
         </div>
+        <div id="symbolError" class="error-message" style="display: none; color: #e53e3e; font-size: 0.8rem; margin-top: 4px;"></div>
         <div id="stockPrice" class="stock-price">Price: -</div>
       </div>
 
@@ -97,10 +107,6 @@
               <div class="result-item">
                 <span>Annualized Return:</span>
                 <span id="putAnnualizedRoi">0.00%</span>
-              </div>
-              <div class="result-item">
-                <span>Position Value:</span>
-                <span id="putPositionValue">$0.00</span>
               </div>
               <div class="result-item">
                 <span>Premium Return:</span>
@@ -162,17 +168,13 @@
                 <span id="callDaysToExp">0</span>
               </div>
               <div class="result-item">
-                <span>Annualized Return:</span>
+                <span>Annualized Return (Premium):</span>
                 <span id="callAnnualizedRoi">0.00%</span>
               </div>
               <div class="result-item">
-                <span>Position Value:</span>
+                <span>Stock Purchase Cost:</span>
                 <span id="callPositionValue">$0.00</span>
               </div>
-              <!-- <div class="result-item">
-                <span>Premium Return:</span>
-                <span id="callPremiumReturn">0.00%</span>
-              </div> -->
               <div class="result-item">
                 <span>Total Return (with stock):</span>
                 <span id="callTotalReturn">0.00%</span>

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Stock Price Viewer",
+  "name": "Options Calculator (Simple)",
   "version": "1.0.0",
-  "description": "View current stock prices using Finnhub API",
+  "description": "Simple options calculator",
   "action": {
     "default_popup": "index.html",
     "default_icon": {
